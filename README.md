@@ -41,4 +41,6 @@ and that function takes 4 parameters:
 
   Where `spaces` is the indentation or the amount of spaces that comes before a member of a bullet list and `value` is the text of a particular member of a bullet list.
 
+  # npm install
+  `npm i markdown2jsx`
    
