@@ -1,0 +1,32 @@
+{
+  "name": "markdown2jsx",
+  "version": "1.0.0",
+  "description": "A Markdown to JSX parser",
+  "main": "main.jsx",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ArjanDEV32/Markdown-parser-React.git"
+  },
+  "keywords": [
+    "markdown",
+    "markdown parser",
+    "parser"
+  ],
+  "author": "https://github.com/ArjanDEV32",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ArjanDEV32/Markdown-parser-React/issues"
+  },
+  "homepage": "https://github.com/ArjanDEV32/Markdown-parser-React#readme"
+}

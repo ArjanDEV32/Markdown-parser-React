@@ -1,0 +1,26 @@
+.md-header{
+  border-bottom: 2px solid rgb(240,240,255);
+}
+
+.md-link{
+  text-decoration: none;
+  color: rgb(100,140,250);
+  font-weight: bold;
+}
+
+.md-link:hover{
+  text-decoration: underline;
+}
+
+.md-code-block{
+  background-color: rgb(245,245,255);
+}
+
+
+.md-block-quote-lb{
+  border-left:5px solid rgb(240,240,255);
+}
+
+.md-inine-code-block{
+  background-color: rgb(245,245,255);
+}
