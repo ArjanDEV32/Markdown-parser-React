@@ -166,6 +166,16 @@ export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
       rem = "", i = range[1]
     }
 
+    if(src[i]=='~' && src[(i+1)%src.length].charCodeAt(0)>32){
+      let range = getRange(src,[src[i]],i+1,MDstyle," ")
+      if(range[3]){ 
+        res.push(<span key={res.length} dangerouslySetInnerHTML={{__html:rem}}/>)
+        if(range[2].length>1) res.push(<span className={MDstyle.linethrough||""} key={res.length} style={{textDecoration:"line-through;"}}>{range[2]}</span>)
+        else res.push(<span className={MDstyle.linethrough||""} key={res.length} style={{textDecoration:"line-through"}}>{range[0]}</span>)
+        rem = "", i = range[1]
+      }
+    }     
+
     if((src[i]=='*'||src[i]=='_') && src[(i+1)%src.length].charCodeAt(0)>32){
       let range = getRange(src,[src[i]],i+1,MDstyle," ")
       if(range[3]){ 
