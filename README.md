@@ -1,6 +1,6 @@
 # Markdown parse in React
 this module converts Markdown into JSX.
-it is composed of one function:
+It is composed of one function:
 ```typescript
 function MarkDown2JSX(src: String, MDstyle: Object, srcCodeFunction: Function, listFunction: Function): Array
 ```
@@ -19,6 +19,7 @@ and that function takes 4 parameters:
   * `inlineCodeBlock`
   * `bold`
   * `italic`
+  * `linethrough`
   * `bulletList`  
 
   Each one of these Markdown Components can be given custom styles by giving them a class-name
