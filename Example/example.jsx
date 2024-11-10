@@ -26,7 +26,7 @@ const MarkDownStyle = {
 
 function App(){  
   const [jsx, setJSX] = useState(MarkDown2JSX(`
-  # Markdown Example
+ # Markdown Example
 
   # This is a Heading h1
   ## This is a Heading h2
@@ -44,7 +44,6 @@ function App(){
     * list Item 2
   * list Item 1
   
-  \`Inline Code Block\`
 
   *Italic*
   _Italic_
@@ -54,9 +53,15 @@ function App(){
 
   **_bold_ _italic_**
 
+  \`Inline Code Block\`
+
   __\`bold inline code block\`__ 
 
   **\`_italic_ _bold_ _inline_ _code_ _block_\`**
+
+  ~linethrough~
+  *~italic-linethrough~* 
+  **~bold-linethrough~** 
 
   [MarkDown link](https://www.markdownguide.org/getting-started/)
 
@@ -93,7 +98,6 @@ if (b==30) b = 20
    <input type="search"/>
 
    <input type="range"/>
-
 `, MarkDownStyle, handleSrcCode, ListIndent))
 
   return(
