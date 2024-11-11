@@ -1,4 +1,4 @@
-# Markdown parse in React
+# Markdown parser in React
 this module converts Markdown into JSX.
 It is composed of one function:
 ```typescript
