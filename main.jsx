@@ -29,6 +29,35 @@ function BlockQuotes(l, src, MDstyle){
   return res
 }
 
+function parseTable(src,rem,i){
+  let res = [], rows = [], rowtxt = "", cols = 1, breakrow = 0
+  rows.push(<th  key={rows.length}><span style={{margin:"5px"}}>{rem}</span></th>)
+  for(let j=i; j<src.length; j++){
+
+    if(src[j]=='\\') {rowtxt+=src[j+1], j+=2}
+    if(src[j]!='|' && src[j]!="\n") rowtxt+=src[j]
+    if(rows.length==0 && src[j]=='\n') return [true,res,j]
+
+    if(breakrow && (src[j]=='|' || src[j]=='\n')){
+      rows.push(<td  key={rows.length}><span style={{margin:"5px"}}>{rowtxt}</span></td>)
+      rowtxt = ""
+      if(rows.length==cols){
+        res.push(<tr key={res.length}>{rows}</tr>)
+        rows = []
+      }
+    }
+    if(!breakrow && (src[j]=='|' || src[j]=='\n')){
+      rows.push(<th  key={rows.length}><span style={{margin:"5px"}}>{rowtxt}</span></th>)
+      rowtxt = "", cols+=1
+      if(src[j]=='\n'){
+        res.push(<tr key={res.length}>{rows}</tr>)
+        rows = [], breakrow = 1
+      }
+    }
+  }
+  return [false,res,src.length]
+}
+
 function getRange(src, e, i, style, limit, f){
   let res = "", j, ep = "", res2 = [], m = 0
   for(j = i; j<src.length; j++){
@@ -58,7 +87,7 @@ function getExt(link){
 }
  
 /**
- * @param {String} src markdown src code
+ * @param {string} src markdown src code
  * @param {Object} MDstyle styles object meant to style some parts of the markdown
  * @param {Function} srcCodeFunction function meant to style or highlight the text within a code block
  * @param {Function} listFunction function that determines what glyph comes before the text within a bullet list
@@ -68,8 +97,17 @@ export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
   let res = [], rem = "", hc = 0, h = 0, gc = 0, g = 0, indent = 0, char = 0, noIndent = 0 
   for(let i = 0; i<src.length; i++){
     if(src[i]=='\\') {rem+=src[i+1], i+=2}
-    
     char = src[i].charCodeAt(0) 
+
+    if(src[i]=='|'){
+      let r = rem.split("\n").pop()
+      let table = parseTable(src,r,i+1)
+      if(table[0]){
+        res.push(<span key={res.length}  dangerouslySetInnerHTML={{__html:rem.slice(0,rem.length-r.length)}}/>)
+        res.push(<table className={MDstyle.table||""} style={{margin:"20px", borderCollapse:"collapse"}} key={res.length}><tbody>{table[1]}</tbody></table>)
+        rem = "", i=table[2]
+      }
+    }
 
     if(!noIndent && src[i]=="#") h = 1 
     if(h && src[i]=="#") hc+=1
@@ -166,24 +204,12 @@ export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
       rem = "", i = range[1]
     }
 
-    if(src[i]=='~' && src[(i+1)%src.length].charCodeAt(0)>32){
-      let range = getRange(src,[src[i]],i+1,MDstyle," ")
-      if(range[3]){ 
-        res.push(<span key={res.length} dangerouslySetInnerHTML={{__html:rem}}/>)
-        if(range[2].length>1) res.push(<span className={MDstyle.linethrough||""} key={res.length} style={{textDecoration:"line-through;"}}>{range[2]}</span>)
-        else res.push(<span className={MDstyle.linethrough||""} key={res.length} style={{textDecoration:"line-through"}}>{range[0]}</span>)
-        rem = "", i = range[1]
-      }
-    }     
-
     if((src[i]=='*'||src[i]=='_') && src[(i+1)%src.length].charCodeAt(0)>32){
-      let range = getRange(src,[src[i]],i+1,MDstyle," ")
-      if(range[3]){ 
-        res.push(<span key={res.length} dangerouslySetInnerHTML={{__html:rem}}/>)
-        if(range[2].length>1) res.push(<span className={MDstyle.italic||""} key={res.length} style={{fontStyle:"italic"}}>{range[2]}</span>)
-        else res.push(<span className={MDstyle.italic||""} key={res.length} style={{fontStyle:"italic"}}>{range[0]}</span>)
-        rem = "", i = range[1]
-      }
+      let range = getRange(src,[src[i]],i+1,MDstyle)
+      res.push(<span key={res.length} dangerouslySetInnerHTML={{__html:rem}}/>)
+      if(range[2].length>1) res.push(<span className={MDstyle.italic||""} key={res.length} style={{fontStyle:"italic"}}>{range[2]}</span>)
+      else res.push(<span className={MDstyle.italic||""} key={res.length} style={{fontStyle:"italic"}}>{range[0]}</span>)
+      rem = "", i = range[1]
     }
 
     if(bulletMarks.hasOwnProperty(src[i]) && !noIndent && src[i+1]==" "){
@@ -198,6 +224,16 @@ export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
           </span>
         )
       rem = "", i = range[1]-1, indent = 0, noIndent = 0
+    }
+
+    if(src[i]=='~' && src[(i+1)%src.length].charCodeAt(0)>32){
+      let range = getRange(src,[src[i]],i+1,MDstyle)
+      if(range[3]){ 
+        res.push(<span key={res.length} dangerouslySetInnerHTML={{__html:rem}}/>)
+        if(range[2].length>1) res.push(<span className={MDstyle.linethrough||""} key={res.length} style={{textDecoration:"line-through;"}}>{range[2]}</span>)
+        else res.push(<span className={MDstyle.linethrough||""} key={res.length} style={{textDecoration:"line-through"}}>{range[0]}</span>)
+        rem = "", i = range[1]
+      }
     }
 
     if(char<=32, !noIndent) indent+=1
