@@ -20,7 +20,8 @@ and that function takes 4 parameters:
   * `bold`
   * `italic`
   * `linethrough`
-  * `bulletList`  
+  * `bulletList`
+  * `table` 
 
   Each one of these Markdown Components can be given custom styles by giving them a class-name
   and then defining that class-name in a CSS file.
@@ -34,6 +35,8 @@ and that function takes 4 parameters:
   Where `src` is the source code and `lan` is the specified language of the source code.
 
 * `listFunction`: call back function meant to determine what glyph comes before the text of a bullet list. (optional)
+
+make sure to see the example in order to see all the current markdown features 
 
   the listFunction should be a function that looks like this:  
   ```typescript
