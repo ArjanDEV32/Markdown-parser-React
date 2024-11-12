@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import { MarkDown2JSX } from './mth.jsx'
-import "./Example/example.css"
+import "./main.css"
 
 function handleSrcCode(src, lan){
-  return <span style={{color:"black"}}>{src}</span>
+  return <span style={{color:"rgb(150,150,170)"}}>{src}</span>
 }
 
 function ListIndent(spaces, value){
@@ -21,16 +21,16 @@ const MarkDownStyle = {
   codeBlock:"md-code-block",
   blockQuoteBackground:"md-block-quote-bg",
   blockQuoteLeftBorder:"md-block-quote-lb",
-  inlineCodeBlock:"md-inine-code-block"
+  inlineCodeBlock:"md-inine-code-block",
+  table:"md-table"
 }
 
 function App(){  
   const [jsx, setJSX] = useState(MarkDown2JSX(`
- # Markdown Example
+  # Markdown Example
 
   # This is a Heading h1
   ## This is a Heading h2
-
   ### This is a Heading h3
   #### This is a Heading h4
   ##### This is a Heading h5
@@ -51,17 +51,23 @@ function App(){
   **Bold**
   __Bold__
 
-  **_bold_ _italic_**
+  **_bold italic_**
+
+  ~linethrough~
+  *~italic linethrough~* 
+  **~bold linethrough~** 
+
 
   \`Inline Code Block\`
 
   __\`bold inline code block\`__ 
 
-  **\`_italic_ _bold_ _inline_ _code_ _block_\`**
+  \`_italic inline code block_\` 
 
-  ~linethrough~
-  *~italic-linethrough~* 
-  **~bold-linethrough~** 
+  **\`_italic bold inline code block\`**
+
+  \`~line through code block~\`
+
 
   [MarkDown link](https://www.markdownguide.org/getting-started/)
 
@@ -75,8 +81,6 @@ let b = 30
 if (b==30) b = 20
 \`\`\`
 
-
-
 ### BlockQuotes
 
 
@@ -87,17 +91,27 @@ if (b==30) b = 20
 >> Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.
 
 
+
+### Table
+
+ Left columns | Right columns
+ left row 1   | right row 1     
+ left row 2   | right row 2     
+ left row 3   | right row 3
+
  ### Escape Examples
 
-  a = 2\\*3*6
-  \\#1
+  a = 2\\*3\\*6
+  \\# 1
   \\\`hello\\\`
+  \\|hello\\|
 
   ### Pure HTML Elements
 
    <input type="search"/>
 
    <input type="range"/>
+
 `, MarkDownStyle, handleSrcCode, ListIndent))
 
   return(
@@ -122,6 +136,6 @@ if (b==30) b = 20
 }
 
 
-createRoot(document.getElementById('md-example-root')).render(
+createRoot(document.getElementById('root')).render(
     <App />
 )
