@@ -36,7 +36,6 @@ and that function takes 4 parameters:
 
 * `listFunction`: call back function meant to determine what glyph comes before the text of a bullet list. (optional)
 
-make sure to see the example in order to see all the current markdown features 
 
   the listFunction should be a function that looks like this:  
   ```typescript
@@ -47,4 +46,7 @@ make sure to see the example in order to see all the current markdown features
 
   # npm install
   `npm i markdown2jsx`
+
+  make sure to see the example in order to see all the current markdown features 
+
    
