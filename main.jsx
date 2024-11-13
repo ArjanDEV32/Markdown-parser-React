@@ -28,7 +28,6 @@ function BlockQuotes(l, src, MDstyle){
   )
   return res
 }
-
 function parseTable(src,i,MDstyle){
   let res = [], rows = [],md=[],row=[], rowtxt = "", cols = 0, breakrow = 0, c = 1
   for(let j=i; j<src.length; j++){
@@ -128,7 +127,6 @@ function parseMarkdown(char, src, i, MDstyle){
 
   if(char=='['){
     let range = getRange(src,[']'],i+1,MDstyle), range2 = ["#",i]
-    console.log(range);
     let j = range[1]
     if(src[j]=="(") range2 = getRange(src,[')'],j+1)
     res.push(<a className={MDstyle.link||""} href={range2[0]} key={res.length}>{range[2]}</a>)
