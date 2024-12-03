@@ -28,37 +28,37 @@ function BlockQuotes(l, src, MDstyle){
   )
   return res
 }
-function parseTable(src,i,MDstyle){
-  let res = [], rows = [],md=[],row=[], rowtxt = "", cols = 0, breakrow = 0, c = 1
-  for(let j=i; j<src.length; j++){
-    if(rows.length==0 && src[j]=='\n') return [true,res,j]
-    if(src[j]=='\\') {rowtxt+=src[j+1], j+=2}
-    if(src[j]=='\n') c=0
-    if(src[j]=='`'|| src[j]=='~'|| src[j]=='[' || src[j]=='_' || bulletMarks.hasOwnProperty(src[j])){
-      md = parseMarkdown(src[j],src,j,MDstyle)
-      if(md[0]) row.push(rowtxt), row.push(md[2]), j = md[1], rowtxt=""
-    }
-    if(src[j]!='|' && src[j]!="\n" && c==1) rowtxt+=src[j]
-    if(src[j]=='|') c+=1
 
-    if(breakrow && (c==2)){
-      row.push(rowtxt)
-      rows.push(<td  key={rows.length}><span style={{margin:"5px"}}>{row}</span></td>)
-      rowtxt = "", c=1, row = []
+function tdORth(fnl,row,rows){
+  if(fnl) rows.push(<td key={rows.length}><span>{row}</span></td>)
+  else rows.push(<th key={rows.length}><span>{row}</span></th>)
+} 
+
+function parseTable(src,i,MDstyle){
+  let res = [], md=[], rows=[],row=[], rowtxt = "", cols = 0, ws = 0, fnl = 0
+  for(let j=i; j<src.length; j++){
+
+    if(!rows.length && src[j]=='\n' && src[j+1]=='\n') return [true, res, j]
+    if(src[j]=='\\') {rowtxt+=src[j+1], j+=2}
+    if(!ws && src[j]!=' ') ws = 1
+    if(src[j]=='|'||src[j]=='\n'){
+      if((row.length||rowtxt.length) && ws){
+        if(!fnl) cols+=1
+        row.push(rowtxt)
+        tdORth(fnl,row,rows)
+      }
+      if(!fnl && src[j]=='\n' && rows.length) fnl = 1
+      rowtxt = "" , ws = 0, row = []
     }
-    
-    if(breakrow && src[j]=='\n'&& rows.length==cols){
-      res.push(<tr key={res.length}>{rows}</tr>)
-      rows = []
-    }
-    if(!breakrow && (c==2)){
-      row.push(rowtxt)
-      rows.push(<th  key={rows.length}><span style={{margin:"5px"}}>{row}</span></th>)
-      rowtxt = "", cols+=1, c = 1, row = []
-    }
-    if(!breakrow && src[j]=='\n'){
-      res.push(<tr key={res.length}>{rows}</tr>)
-      rows = [], breakrow = 1
+    if((fnl && rows.length==cols) || (src[j]=='\n' && rows.length)) res.push(<tr key={res.length}>{rows}</tr>), rows = []
+    if(ws){ 
+      if(src[j]=='`'|| src[j]=='~'|| src[j]=='[' || src[j]=='_' || bulletMarks.hasOwnProperty(src[j])){
+        md = parseMarkdown(src[j],src,j,MDstyle)
+        if(md[0]){
+          row.push([rowtxt,md[2]]), j = md[1]-1, rowtxt=""
+          if(!fnl) cols+=1
+        }
+      } else rowtxt+=src[j]
     }
   }
   return [false, res, i]
@@ -147,6 +147,11 @@ function parseMarkdown(char, src, i, MDstyle){
   return [false]
 }
 
+function addRem(res, rem, allowHTML){
+  if(allowHTML) res.push(<span key={res.length} dangerouslySetInnerHTML={{__html:rem}}/>)
+  else res.push(<span key={res.length} >{rem}</span>)
+}
+
  
 /**
  * @param {string} src markdown src code
@@ -155,7 +160,7 @@ function parseMarkdown(char, src, i, MDstyle){
  * @param {Function} listFunction function that determines what glyph comes before the text within a bullet list
  * @returns an array of jsx components
  */
-export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
+export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction, allowHTML){
   let res = [],md=[], rem = "", hc = 0, h = 0, gc = 0, g = 0, indent = 0, char = 0, noIndent = 0 
   for(let i = 0; i<src.length; i++){
     if(src[i]=='\\') {rem+=src[i+1], i+=2}
@@ -164,7 +169,7 @@ export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
     if(src[i]=='|'){
       let table = parseTable(src,i+1,MDstyle)
       if(table[0]){
-        res.push(<span key={res.length}  dangerouslySetInnerHTML={{__html:rem}}/>)
+        addRem(res,rem,allowHTML)
         res.push(<table className={MDstyle.table||""} style={{margin:"20px", borderCollapse:"collapse"}} key={res.length}><tbody>{table[1]}</tbody></table>)
         rem = "", i=table[2]
       }
@@ -175,7 +180,7 @@ export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
     if(h && (src[i]==' ' && src[i-1]=='#' && hc<=6)){
       rem = rem.slice(0,rem.length-hc)
       let range = getRange(src,["\n"],i+1)
-      res.push(<span key={res.length} dangerouslySetInnerHTML={{__html:rem}}/>)
+      addRem(res,rem,allowHTML)
       res.push(<div className={MDstyle.header||""} key={res.length} style={{marginInline:"10px", minWidth: "98%", maxWidth: "min-content",display:"flex", fontWeight:"bold", fontSize:`${(8-hc)*5}px`}}>{range[0]}</div>)
       h = 0, hc = 0, i = range[1], rem = "", indent = 0, noIndent = 0
     } 
@@ -186,7 +191,7 @@ export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
         lan = range[0].split("\n")[0]
         range[0] = range[0].slice(lan.length,range[0].length)
       }
-      res.push(<span key={res.length} dangerouslySetInnerHTML={{__html:rem}}/>)
+      addRem(res,rem,allowHTML)
       res.push(
       <article className={MDstyle.codeBlock||""} key={res.length} style={{marginInline:"10px", minWidth: "98%", maxWidth: "min-content", borderRadius:"5px"}}>
         <main style={{marginInline:"10px"}}>{srcCodeFunction!=undefined?srcCodeFunction(range[0],lan):range[0]}</main>
@@ -198,7 +203,7 @@ export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
     if(src[i]=='`'|| src[i]=='~'|| src[i]=='[' || src[i]=='_' || bulletMarks.hasOwnProperty(src[i])){
       md = parseMarkdown(src[i],src,i,MDstyle)
       if(md[0]){
-        res.push(<span key={res.length} dangerouslySetInnerHTML={{__html:rem}}/>)
+        addRem(res,rem,allowHTML)
         res.push(<span key={res.length}>{md[2]}</span>)
         i = md[1], rem=""
       }
@@ -209,7 +214,7 @@ export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
     if((g && src[i]=='>' && src[i+1]==" ")){
       let range = getRange(src,["\n\n","\n>"],i+1,MDstyle), r = []
       rem = rem.slice(0,rem.length-gc)
-      res.push(<span key={res.length} dangerouslySetInnerHTML={{__html:rem}}/>)
+      addRem(res,rem,allowHTML)
       if(range[2].length>1) r = range[2]
       else r = range[0]
       res.push(
@@ -224,7 +229,7 @@ export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
       let range = getRange(src,[']'],i+2), range2 = ["#",0]
       i = range[1]
       if(src[i]=="(") range2 = getRange(src,[')'],i+1), i = range2[1]
-      res.push(<span key={res.length} dangerouslySetInnerHTML={{__html:rem}}/>)
+      addRem(res,rem,allowHTML)
       let ext = getExt(range2[0])
       if(ext=="pgj" || ext=="gnp" || ext=="pbew") res.push(<img src={range2[0]}  key={res.length} style={JSON.parse("{"+range[0]+"}")||{}}/>)
       if(ext=="4pm" || ext=="fig") res.push(<video src={range2[0]} controls={true}  key={res.length} style={JSON.parse("{"+range[0]+"}")||{}}></video>)
@@ -234,7 +239,7 @@ export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
 
     if(bulletMarks.hasOwnProperty(src[i]) && !noIndent && src[i+1]==" "){
       let range = getRange(src,["\n"],i+1,MDstyle,undefined,1), c = ""
-      res.push(<span key={res.length} dangerouslySetInnerHTML={{__html:rem}}/>)
+      addRem(res,rem,allowHTML)
       if(range[2].length>1) c = <span>{range[2]}</span>
       else c = <span>{" "+range[0]}</span>
         res.push(
@@ -244,7 +249,7 @@ export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
           </span>
         )
       rem = "", i = range[1]-1, indent = 0, noIndent = 0
-    }
+    } 
 
     if(char<=32, !noIndent) indent+=1
     if(char>32) noIndent = 1
@@ -253,6 +258,6 @@ export function MarkDown2JSX(src, MDstyle, srcCodeFunction, listFunction){
     if(i<src.length) rem+=src[i]
   }
   
-  res.push(<span key={res.length} dangerouslySetInnerHTML={{__html:rem}}/>)
+  addRem(res,rem,allowHTML)
   return res
 }
