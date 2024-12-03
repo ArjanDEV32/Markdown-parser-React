@@ -57,7 +57,7 @@ function App(){
   *~italic linethrough~* 
   **~bold linethrough~** 
 
-
+  
   \`Inline Code Block\`
 
   __\`bold inline code block\`__ 
@@ -71,7 +71,7 @@ function App(){
 
   [MarkDown link](https://www.markdownguide.org/getting-started/)
 
-  !["width":"100px", "height":"100px"](./Example/markdown-icon.webp)
+  !["width":"100px", "height":"100px"](./src/markdown-icon.webp)
 
  ### Code Block 
   
@@ -90,12 +90,14 @@ if (b==30) b = 20
 
 >> Markdown is often used to format readme files, for writing messages in online discussion forums, and to create rich text using a plain text editor.
 
+
 ### Table
 
- |Left columns | Right columns|
- |left row 1   | right row 1| 
- |left row 2   | right row 2|
- |left row 3   | right row 3|
+  |Left columns  |Right columns
+  |left row 1    | right row 1
+  |left row 2    | right row 2
+  |left row 3    | right row 3
+
 
  ### Escape Examples
 
@@ -114,7 +116,7 @@ if (b==30) b = 20
 
    <input type="checkbox"/>  <input type="radio"/>   
 
-`, MarkDownStyle, handleSrcCode, ListIndent))
+`, MarkDownStyle, handleSrcCode, ListIndent, true))
 
   return(
    <div style={{
