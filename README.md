@@ -2,7 +2,7 @@
 this module converts Markdown into JSX.
 It is composed of one function:
 ```typescript
-function MarkDown2JSX(src: String, MDstyle: Object, srcCodeFunction: Function, listFunction: Function): Array
+function MarkDown2JSX(src: String, MDstyle: Object, srcCodeFunction: Function, listFunction: Function, allowHTML: Boolean): Array
 ```
 and that function takes 4 parameters:
 
@@ -41,8 +41,10 @@ and that function takes 4 parameters:
   ```typescript
   function listFunction(spaces: Number, value: String): String
   ```
-
   Where `spaces` is the indentation or the amount of spaces that comes before a member of a bullet list and `value` is the text of a particular member of a bullet list.
+
+* `allowHTML`: boolean value that determines if HTML text will be rendered as raw HTML or as raw text
+
 
   # npm install
   `npm i markdown2jsx`
